@@ -1,12 +1,30 @@
 # Information Architecture
 
-## Goal
+## Objective
 
-Design a simple, scalable, and intuitive navigation system for Enterprise AI Workspace.
+The goal of the Enterprise AI Workspace is to provide a simple, intuitive, and scalable navigation experience that allows users to access AI tools, documents, workspaces, and settings with minimal effort.
 
 ---
 
-# Main Navigation
+# Navigation Structure
+
+Landing Page
+
+↓
+
+Authentication
+
+- Login
+- Register
+- Forgot Password
+
+↓
+
+Dashboard
+
+↓
+
+Main Navigation
 
 - Dashboard
 - AI Chat
@@ -21,10 +39,11 @@ Design a simple, scalable, and intuitive navigation system for Enterprise AI Wor
 
 # Dashboard
 
-Purpose:
-Provide users with a quick overview of their work.
+Purpose
 
-Contains:
+Provide a quick overview of user activity.
+
+Features
 
 - Recent Chats
 - Recent Workspaces
@@ -36,81 +55,121 @@ Contains:
 
 # AI Chat
 
-Purpose:
+Purpose
 
-Interact with multiple AI models.
+Interact with different AI providers.
 
-Features:
+Features
 
-- New Chat
+- Create Chat
 - Chat History
-- Streaming Response
-- File Attachment
+- Streaming Responses
+- Upload Files
+- Markdown Support
+- Copy Response
+- Regenerate Response
 - Model Switcher
 
 ---
 
 # Workspaces
 
-Purpose:
+Purpose
 
-Organize projects separately.
+Organize work into separate projects.
 
-Features:
+Features
 
 - Create Workspace
 - Rename Workspace
 - Delete Workspace
 - Favorite Workspace
+- Workspace Settings
 
 ---
 
 # Documents
 
-Purpose:
+Purpose
 
-Store and manage files.
+Manage uploaded knowledge.
 
-Supported:
+Features
 
-- PDF
-- DOCX
-- Images
+- Upload PDF
+- Upload DOCX
+- Upload Images
+- Delete Files
+- Search Documents
 
 ---
 
 # Prompt Library
 
-Purpose:
+Purpose
 
-Save reusable prompts.
+Store reusable prompts.
 
-Features:
+Features
 
+- Create Prompt
+- Edit Prompt
+- Delete Prompt
 - Categories
 - Favorites
 - Search
 
 ---
 
+# AI Models
+
+Purpose
+
+Allow users to switch between different AI providers.
+
+Supported Models
+
+- OpenAI
+- Gemini
+- Claude
+- Ollama
+- Groq
+
+---
+
 # Settings
 
-Purpose:
+Purpose
 
-Manage application preferences.
+Manage user preferences.
 
-Includes:
+Features
 
 - Theme
 - Profile
 - Password
-- Connected AI Providers
+- Connected APIs
+- Preferences
 
 ---
 
-# Navigation Principles
+# Design Principles
 
-- Maximum 2 clicks to reach any feature.
-- Keep the sidebar clean.
+- Keep navigation simple.
+- Maximum two clicks to reach any feature.
+- Maintain consistency across all pages.
+- Design for scalability.
 - Prioritize frequently used features.
-- Maintain consistency across pages.
+
+---
+
+# Future Expansion
+
+Future versions may include:
+
+- Team Collaboration
+- Shared Workspaces
+- Calendar
+- Tasks
+- AI Agents
+- Workflow Automation
