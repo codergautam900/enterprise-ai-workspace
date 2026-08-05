@@ -1,5 +1,7 @@
 type ButtonProps = {
   children: React.ReactNode;
+  type?: "button" | "submit" | "reset";
+  variant?: "primary" | "secondary" | "ghost";
   className?: string;
 };
 
