@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 export interface IDocumentChunk {
-  documentId: Schema.Types.ObjectId;
+  documentId: Types.ObjectId;
   content: string;
   chunkIndex: number;
   tokenCount: number;

@@ -1,16 +1,16 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
-export type DocumentStatus = "UPLOADING" | "PROCESSING" | "READY" | "FAILED";
+export type DocumentStatus = "UPLOADED" | "PROCESSING" | "READY" | "FAILED";
 
 export interface IDocument {
-  workspaceId: Schema.Types.ObjectId;
-  uploadedById: Schema.Types.ObjectId;
+  workspaceId: Types.ObjectId;
+  uploadedBy: Types.ObjectId;
   title: string;
   description?: string | null;
-  fileName: string;
-  mimeType: string;
-  fileSize: number;
-  storageKey: string;
+  fileName?: string | null;
+  fileUrl?: string | null;
+  mimeType?: string | null;
+  fileSize?: number | null;
   status: DocumentStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -19,18 +19,18 @@ export interface IDocument {
 const documentSchema = new Schema<IDocument>(
   {
     workspaceId: { type: Schema.Types.ObjectId, ref: "Workspace", required: true },
-    uploadedById: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    uploadedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true, trim: true },
     description: { type: String, trim: true, default: null },
-    fileName: { type: String, required: true, trim: true },
-    mimeType: { type: String, required: true, trim: true },
-    fileSize: { type: Number, required: true },
-    storageKey: { type: String, required: true, trim: true },
+    fileName: { type: String, trim: true, default: null },
+    fileUrl: { type: String, trim: true, default: null },
+    mimeType: { type: String, trim: true, default: null },
+    fileSize: { type: Number, default: null },
     status: {
       type: String,
       required: true,
-      enum: ["UPLOADING", "PROCESSING", "READY", "FAILED"],
-      default: "UPLOADING",
+      enum: ["UPLOADED", "PROCESSING", "READY", "FAILED"],
+      default: "UPLOADED",
     },
   },
   {
@@ -39,5 +39,6 @@ const documentSchema = new Schema<IDocument>(
 );
 
 documentSchema.index({ workspaceId: 1 });
+documentSchema.index({ uploadedBy: 1 });
 
 export const DocumentModel = model<IDocument>("Document", documentSchema);

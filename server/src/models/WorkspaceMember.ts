@@ -1,12 +1,13 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 export type WorkspaceMemberRole = "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
 
 export interface IWorkspaceMember {
-  workspaceId: Schema.Types.ObjectId;
-  userId: Schema.Types.ObjectId;
+  workspaceId: Types.ObjectId;
+  userId: Types.ObjectId;
   role: WorkspaceMemberRole;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 const workspaceMemberSchema = new Schema<IWorkspaceMember>(
@@ -20,10 +21,12 @@ const workspaceMemberSchema = new Schema<IWorkspaceMember>(
     },
   },
   {
-    timestamps: { createdAt: true, updatedAt: false },
+    timestamps: true,
   },
 );
 
+workspaceMemberSchema.index({ workspaceId: 1 });
+workspaceMemberSchema.index({ userId: 1 });
 workspaceMemberSchema.index({ workspaceId: 1, userId: 1 }, { unique: true });
 
 export const WorkspaceMemberModel = model<IWorkspaceMember>("WorkspaceMember", workspaceMemberSchema);

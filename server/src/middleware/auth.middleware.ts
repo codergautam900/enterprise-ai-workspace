@@ -1,16 +1,25 @@
 import type { NextFunction, Request, Response } from "express";
-import { getAuthCookieName, verifyToken } from "../utils/jwt.js";
+import { verifyToken } from "../utils/jwt.js";
 
 export default function authMiddleware(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies?.[getAuthCookieName()];
+  const authHeader = req.headers.authorization;
 
-  if (!token || typeof token !== "string") {
+  if (!authHeader || typeof authHeader !== "string" || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  const token = authHeader.slice("Bearer ".length).trim();
+
+  if (!token) {
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
 
   try {
     const payload = verifyToken(token);
-    (req as any).userId = payload.userId;
+    req.user = {
+      userId: payload.userId,
+      role: payload.role,
+    };
     return next();
   } catch {
     return res.status(401).json({ success: false, message: "Unauthorized" });

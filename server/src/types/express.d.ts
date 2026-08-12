@@ -1,7 +1,18 @@
-import type { Request } from "express";
+export type UserRole = "USER" | "ADMIN";
+export type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
 
-declare module "express" {
-  interface Request {
-    userId?: string;
+export interface AuthenticatedUser {
+  userId: string;
+  role: UserRole;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthenticatedUser;
+      workspaceRole?: WorkspaceRole;
+    }
   }
 }
+
+export {};
