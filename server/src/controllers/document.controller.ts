@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import {
@@ -7,6 +8,7 @@ import {
   getWorkspaceDocuments,
   updateDocumentMetadata,
 } from "../services/document.service.js";
+import { getFileValidationError, uploadFile } from "../services/storage.service.js";
 
 export async function createDocumentController(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
@@ -26,48 +28,41 @@ export async function createDocumentController(req: Request, res: Response, next
     const workspaceId = Array.isArray(req.params.workspaceId)
       ? req.params.workspaceId[0] ?? ""
       : req.params.workspaceId ?? "";
-    const { title, description, fileName, fileUrl, mimeType, fileSize, status } = req.body as {
-      title?: string;
-      description?: string;
-      fileName?: string;
-      fileUrl?: string;
-      mimeType?: string;
-      fileSize?: number;
-      status?: string;
-    };
+    const file = req.file;
 
+    if (!file) {
+      return res.status(400).json({ success: false, message: "File is required" });
+    }
+
+    const validationError = getFileValidationError(file);
+
+    if (validationError) {
+      return res.status(400).json({ success: false, message: validationError });
+    }
+
+    const title = typeof req.body.title === "string" ? req.body.title.trim() : "";
+    const description = typeof req.body.description === "string" ? req.body.description.trim() || undefined : undefined;
+
+    const uploadedFile = await uploadFile(file);
     const documentInput: {
       title: string;
       description?: string;
-      fileName?: string;
-      fileUrl?: string;
-      mimeType?: string;
-      fileSize?: number;
+      fileName: string;
+      fileUrl: string;
+      mimeType: string;
+      fileSize: number;
       status?: string;
-    } = { title: title ?? "" };
+    } = {
+      title: title || path.parse(file.originalname).name || "Document",
+      fileName: file.originalname,
+      fileUrl: uploadedFile.url,
+      mimeType: file.mimetype,
+      fileSize: file.size,
+      status: "UPLOADED",
+    };
 
     if (description !== undefined) {
       documentInput.description = description;
-    }
-
-    if (fileName !== undefined) {
-      documentInput.fileName = fileName;
-    }
-
-    if (fileUrl !== undefined) {
-      documentInput.fileUrl = fileUrl;
-    }
-
-    if (mimeType !== undefined) {
-      documentInput.mimeType = mimeType;
-    }
-
-    if (fileSize !== undefined) {
-      documentInput.fileSize = fileSize;
-    }
-
-    if (status !== undefined) {
-      documentInput.status = status;
     }
 
     const document = await createDocument(workspaceId, user.userId, documentInput);

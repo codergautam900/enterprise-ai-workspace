@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import { body, param } from "express-validator";
 import {
   createWorkspaceController,
@@ -16,8 +17,13 @@ import {
 } from "../controllers/document.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import { requireWorkspacePermission } from "../middleware/workspaceAccess.js";
+import { MAX_FILE_SIZE_BYTES } from "../services/storage.service.js";
 
 const router = Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_FILE_SIZE_BYTES },
+});
 
 router.use(authMiddleware);
 
@@ -56,8 +62,9 @@ router.delete(
 router.post(
   "/:workspaceId/documents",
   param("workspaceId").isMongoId().withMessage("Invalid workspace id"),
-  body("title").trim().notEmpty().withMessage("Document title is required"),
-  body("status").optional().isIn(["UPLOADED", "PROCESSING", "READY", "FAILED"]).withMessage("Invalid document status"),
+  upload.single("file"),
+  body("title").optional().trim().notEmpty().withMessage("Document title is required"),
+  body("description").optional({ values: "falsy" }).trim(),
   requireWorkspacePermission("MEMBER"),
   createDocumentController,
 );

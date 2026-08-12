@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { DocumentModel, type DocumentStatus, type IDocument } from "../models/Document.js";
 import { WorkspaceMemberModel } from "../models/WorkspaceMember.js";
 import { hasWorkspacePermission } from "../middleware/workspaceAccess.js";
+import { deleteFile, getPublicIdFromCloudinaryUrl } from "./storage.service.js";
 
 const ALLOWED_DOCUMENT_STATUSES: DocumentStatus[] = ["UPLOADED", "PROCESSING", "READY", "FAILED"];
 
@@ -213,6 +214,21 @@ export async function updateDocumentMetadata(
 
 export async function deleteDocument(workspaceId: string, documentId: string, userId: string): Promise<DocumentRecord> {
   await ensureDocumentAccess(workspaceId, userId, "ADMIN");
+
+  const existingDocument = await DocumentModel.findOne({
+    _id: new Types.ObjectId(documentId),
+    workspaceId: new Types.ObjectId(workspaceId),
+  }).exec();
+
+  if (!existingDocument) {
+    throw createHttpError("Document not found", 404);
+  }
+
+  const publicId = existingDocument.fileUrl ? getPublicIdFromCloudinaryUrl(existingDocument.fileUrl) : null;
+
+  if (publicId) {
+    await deleteFile(publicId);
+  }
 
   const document = await DocumentModel.findOneAndDelete({
     _id: new Types.ObjectId(documentId),
