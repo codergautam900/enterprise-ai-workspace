@@ -84,6 +84,48 @@ router.get(
   getDocumentController,
 );
 
+// Document processing
+router.post(
+  "/:workspaceId/documents/:documentId/process",
+  param("workspaceId").isMongoId().withMessage("Invalid workspace id"),
+  param("documentId").isMongoId().withMessage("Invalid document id"),
+  requireWorkspacePermission("ADMIN"),
+  async (req, res, next) => {
+    try {
+      const user = req.user;
+      if (!user) return res.status(401).json({ success: false, message: "Unauthenticated" });
+      const workspaceId = Array.isArray(req.params.workspaceId) ? req.params.workspaceId[0] ?? "" : req.params.workspaceId ?? "";
+      const documentId = Array.isArray(req.params.documentId) ? req.params.documentId[0] ?? "" : req.params.documentId ?? "";
+      const { processDocument } = await import("../services/processing.service.js");
+      await processDocument(documentId, workspaceId, user.userId);
+      return res.status(200).json({ success: true, message: "Processing started" });
+    } catch (err) {
+      return next(err);
+    }
+  },
+);
+
+router.get(
+  
+  "/:workspaceId/documents/:documentId/chunks",
+  param("workspaceId").isMongoId().withMessage("Invalid workspace id"),
+  param("documentId").isMongoId().withMessage("Invalid document id"),
+  requireWorkspacePermission("VIEWER"),
+  async (req, res, next) => {
+    try {
+      const user = req.user;
+      if (!user) return res.status(401).json({ success: false, message: "Unauthenticated" });
+      const workspaceId = Array.isArray(req.params.workspaceId) ? req.params.workspaceId[0] ?? "" : req.params.workspaceId ?? "";
+      const documentId = Array.isArray(req.params.documentId) ? req.params.documentId[0] ?? "" : req.params.documentId ?? "";
+      const { getDocumentChunks } = await import("../services/processing.service.js");
+      const chunks = await getDocumentChunks(documentId, workspaceId, user.userId);
+      return res.status(200).json({ success: true, data: { chunks } });
+    } catch (err) {
+      return next(err);
+    }
+  },
+);
+
 router.patch(
   "/:workspaceId/documents/:documentId",
   param("workspaceId").isMongoId().withMessage("Invalid workspace id"),

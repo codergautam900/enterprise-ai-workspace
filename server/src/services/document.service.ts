@@ -14,7 +14,7 @@ function createHttpError(message: string, status: number): Error & { status: num
 
 export type DocumentRecord = IDocument & { _id: string };
 
-async function ensureDocumentAccess(workspaceId: string, userId: string, minimumRole: "VIEWER" | "MEMBER" | "ADMIN") {
+export async function ensureDocumentAccess(workspaceId: string, userId: string, minimumRole: "VIEWER" | "MEMBER" | "ADMIN") {
   const membership = await WorkspaceMemberModel.findOne({
     workspaceId: new Types.ObjectId(workspaceId),
     userId: new Types.ObjectId(userId),
