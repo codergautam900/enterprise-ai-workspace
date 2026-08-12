@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import authRoutes from "./routes/auth.routes.js";
+import errorMiddleware from "./middleware/error.middleware.js";
 
 const app = express();
 
@@ -20,5 +22,8 @@ app.get("/api/health", (_req, res) => {
     message: "Enterprise AI Workspace API is running",
   });
 });
+
+app.use("/api/auth", authRoutes);
+app.use(errorMiddleware);
 
 export default app;
