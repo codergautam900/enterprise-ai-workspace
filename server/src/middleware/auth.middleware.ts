@@ -1,14 +1,30 @@
 import type { NextFunction, Request, Response } from "express";
-import { verifyToken } from "../utils/jwt.js";
+import { getAuthCookieName, verifyToken } from "../utils/jwt.js";
 
-export default function authMiddleware(req: Request, res: Response, next: NextFunction) {
+function getBearerToken(req: Request): string | null {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || typeof authHeader !== "string" || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
+    return null;
   }
 
   const token = authHeader.slice("Bearer ".length).trim();
+  return token || null;
+}
+
+function getCookieToken(req: Request): string | null {
+  const cookies = req.cookies as unknown;
+
+  if (typeof cookies !== "object" || cookies === null) {
+    return null;
+  }
+
+  const token = (cookies as Record<string, unknown>)[getAuthCookieName()];
+  return typeof token === "string" && token.trim() ? token.trim() : null;
+}
+
+export default function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  const token = getBearerToken(req) ?? getCookieToken(req);
 
   if (!token) {
     return res.status(401).json({ success: false, message: "Unauthorized" });
